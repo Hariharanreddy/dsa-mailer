@@ -86,6 +86,13 @@ app.get("/send-dsa", async (req, res) => {
   res.send(result);
 });
 
+app.get("/", async (req, res) => {
+  res.send(`
+    <h1>DSA Mailer Working properly</h1>
+    <p>Use the endpoint <a href="/send-dsa">/send-dsa</a> to send your daily DSA questions.</p>
+  `);
+});
+
 app.listen(PORT, () => {
   console.log(`DSA Mailer running on http://localhost:${PORT}`);
 });
