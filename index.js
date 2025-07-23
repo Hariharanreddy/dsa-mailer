@@ -1,78 +1,91 @@
+// dsa-mailer/index.js
 require("dotenv").config();
+const express = require("express");
 const fs = require("fs");
 const path = require("path");
-const nodemailer = require("nodemailer");
-const express = require("express");
+const SibApiV3Sdk = require("sib-api-v3-sdk");
+
 const app = express();
-
 const PORT = process.env.PORT || 3000;
-const DSA_FOLDER = "./dsa_questions";
-const LOG_FILE = "./sent_log.txt";
-const QUESTIONS_PER_DAY = 3;
 
-const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.FROM_EMAIL,
-    pass: process.env.BREVO_API_KEY,
-  },
-});
+// Brevo API setup
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
+defaultClient.authentications["api-key"].apiKey = process.env.BREVO_API_KEY;
+const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
-function getAllJavaFiles(dirPath, array = []) {
-  fs.readdirSync(dirPath).forEach(f => {
-    const full = path.join(dirPath, f);
-    if (fs.statSync(full).isDirectory()) getAllJavaFiles(full, array);
-    else if (f.endsWith(".java")) array.push(full);
+const QUESTIONS_DIR = path.join(__dirname, "java-output");
+const SENT_LOG_FILE = path.join(__dirname, "sent-log.txt");
+
+// Load sent log
+function loadSentLog() {
+  if (!fs.existsSync(SENT_LOG_FILE)) return [];
+  const content = fs.readFileSync(SENT_LOG_FILE, "utf-8");
+  return content.split("\n").filter(Boolean);
+}
+
+// Save to log
+function appendToSentLog(filePaths) {
+  fs.appendFileSync(SENT_LOG_FILE, filePaths.join("\n") + "\n");
+}
+
+// Recursively collect all Java file paths
+function getAllJavaFiles(dir) {
+  let results = [];
+  fs.readdirSync(dir).forEach(file => {
+    const fullPath = path.join(dir, file);
+    if (fs.statSync(fullPath).isDirectory()) {
+      results = results.concat(getAllJavaFiles(fullPath));
+    } else if (file.endsWith(".java")) {
+      results.push(fullPath);
+    }
   });
-  return array;
+  return results;
 }
 
-function readSentLog() {
-  if (!fs.existsSync(LOG_FILE)) return [];
-  return fs.readFileSync(LOG_FILE, "utf8")
-    .split("\n").filter(Boolean);
+// Select next 3 unsent questions
+function getNextQuestions(count = 3) {
+  const allFiles = getAllJavaFiles(QUESTIONS_DIR);
+  const sentFiles = new Set(loadSentLog());
+  const unsentFiles = allFiles.filter(file => !sentFiles.has(file));
+  return unsentFiles.slice(0, count);
 }
 
-function updateLog(files) {
-  fs.appendFileSync(LOG_FILE, files.join("\n") + "\n");
+// Read Java file contents
+function getFileContents(filePaths) {
+  return filePaths.map(filePath => {
+    return `<h3>${path.basename(filePath)}</h3><pre>${fs.readFileSync(filePath, "utf-8")}</pre>`;
+  }).join("<hr>");
 }
 
-function formatEmailBody(items) {
-  return items.map(({ file, content }, i) =>
-    `<h3>Q${i+1}: ${path.basename(file)}</h3>
-     <pre style="background:#f4f4f4;padding:10px;">${content}</pre><br>`
-  ).join("");
-}
+// Send the email using Brevo API
+async function sendEmailWithQuestions() {
+  const filesToSend = getNextQuestions();
+  if (filesToSend.length === 0) return "No new questions to send.";
 
-async function sendNextDSAQuestions() {
-  const all = getAllJavaFiles(DSA_FOLDER).sort();
-  const sent = readSentLog();
-  const remaining = all.filter(f => !sent.includes(f));
-  const today = remaining.slice(0, QUESTIONS_PER_DAY);
-  if (today.length === 0) return "✅ All questions have been sent!";
-  const items = today.map(f => ({ file: f, content: fs.readFileSync(f, "utf8") }));
-  const html = formatEmailBody(items);
-  await transporter.sendMail({
-    from: process.env.FROM_EMAIL,
-    to: process.env.TO_EMAIL,
-    subject: "🧠 Daily 3 DSA Questions",
-    html
-  });
-  updateLog(today);
-  return `✅ Email sent with ${today.length} questions.`;
-}
+  const emailBody = getFileContents(filesToSend);
+  const sendSmtpEmail = {
+    to: [{ email: process.env.YOUR_EMAIL }],
+    sender: { name: "DSA Bot", email: process.env.YOUR_EMAIL },
+    subject: "Your Daily DSA Questions",
+    htmlContent: `<div>${emailBody}</div>`
+  };
 
-app.get("/run-cron", async (req, res) => {
   try {
-    const msg = await sendNextDSAQuestions();
-    res.send(msg);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal Error");
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    appendToSentLog(filesToSend);
+    return `Sent ${filesToSend.length} questions.`;
+  } catch (error) {
+    console.error("Failed to send email:", error);
+    return "Error occurred while sending email.";
   }
+}
+
+// Express route to trigger manually
+app.get("/send-dsa", async (req, res) => {
+  const result = await sendEmailWithQuestions();
+  res.send(result);
 });
 
-app.get("/", (req, res) => res.send("DSA Mailer is running. Use /run-cron to trigger."));
-app.listen(PORT, () => console.log(`Server up on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`DSA Mailer running on http://localhost:${PORT}`);
+});

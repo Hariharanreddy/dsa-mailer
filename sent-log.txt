@@ -1,0 +1,6 @@
+E:\Desktop\Code\dsa-mailer\java-output\Lecture002 Write First C++ Program\firstProgram.java
+E:\Desktop\Code\dsa-mailer\java-output\Lecture003 If-Else, While loop & Lots of Patterns\conditionals.java
+E:\Desktop\Code\dsa-mailer\java-output\Lecture003 If-Else, While loop & Lots of Patterns\pattern1.java
+E:\Desktop\Code\dsa-mailer\java-output\Lecture003 If-Else, While loop & Lots of Patterns\pattern2.java
+E:\Desktop\Code\dsa-mailer\java-output\Lecture003 If-Else, While loop & Lots of Patterns\primeNumber.java
+E:\Desktop\Code\dsa-mailer\java-output\Lecture003 If-Else, While loop & Lots of Patterns\sumOfN.java

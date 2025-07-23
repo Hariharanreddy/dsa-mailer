@@ -4,11 +4,13 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "dependencies": {
     "dotenv": "^16.0.0",
     "express": "^4.18.0",
-    "nodemailer": "^6.9.0"
+    "nodemailer": "^6.9.0",
+    "sib-api-v3-sdk": "^8.5.0"
   }
 }
