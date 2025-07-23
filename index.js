@@ -99,7 +99,6 @@ app.get("/send-dsa", async (req, res) => {
 app.get("/", (req, res) => {
   res.send(`
     <h1>DSA Mailer Working Properly</h1>
-    <p>Use the endpoint <a href="/send-dsa">/send-dsa</a> to send your daily DSA questions.</p>
   `);
 });
 
