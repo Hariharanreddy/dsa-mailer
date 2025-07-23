@@ -54,7 +54,7 @@ function getFileContents(filePaths) {
 // Select next 3 unsent questions
 async function getNextQuestions(count = 3) {
   const allFiles = getAllJavaFiles(QUESTIONS_DIR);
-  const sentDocs = await SentFile.find().sort({ _id: -1 }).limit(3);
+  const sentDocs = await SentFile.find();
   console.log("Sent documents:", sentDocs);
   const sentPaths = new Set(sentDocs.map(doc => doc.path));
   const unsentFiles = allFiles.filter(file => !sentPaths.has(file));
