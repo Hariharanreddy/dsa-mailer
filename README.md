@@ -1,7 +1,7 @@
 Here’s the **fully updated `README.md`** reflecting the *latest changes* — including:
 
 * Brevo **Transactional Email API** (not SMTP or campaign),
-* **Express.js server** with `/run-cron` route,
+* **Express.js server** with `/send-dsa` route,
 * Both **sender and receiver email same**,
 * Hosted on **Render**, triggered via **external cron** (e.g., cron-job.org),
 * Uses `.txt` log instead of database.
@@ -20,7 +20,7 @@ A lightweight Express.js app that **emails 3 Java DSA questions daily** using th
 - Sends **3 `.java` files daily** as email content
 - Scans all nested files inside `dsa_questions/`
 - Skips already sent files (tracked in `sent_log.txt`)
-- Easy to self-host + run via `/run-cron` route
+- Easy to self-host + run via `/send-dsa` route
 - No DB — uses plain `.txt` log for tracking
 
 ---
@@ -69,7 +69,7 @@ node index.js
 Visit in browser:
 
 ```
-http://localhost:3000/run-cron
+http://localhost:3000/send-dsa
 ```
 
 It will:
@@ -94,7 +94,7 @@ It will:
 Render URL will look like:
 
 ```
-https://dsa-mailer.onrender.com/run-cron
+https://dsa-mailer.onrender.com/send-dsa
 ```
 
 ---
@@ -103,7 +103,7 @@ https://dsa-mailer.onrender.com/run-cron
 
 Use [cron-job.org](https://cron-job.org):
 
-* URL: `https://<your-app>.onrender.com/run-cron`
+* URL: `https://<your-app>.onrender.com/send-dsa`
 * Schedule: `Daily at 3:00 AM IST`
 
 No database, no backend state — simple `.txt` based tracking.
@@ -157,8 +157,8 @@ No database, no backend state — simple `.txt` based tracking.
 
 | Route            | Description                     |
 | ---------------- | ------------------------------- |
-| `/run-cron`      | Triggers mail with next 3 files |
-| `/` or `/health` | Returns "DSA Mailer is running" |
+| `/send-dsa`      | Triggers mail with next 3 files |
+| `/`              | Returns "DSA Mailer is running" |
 
 ---
 
