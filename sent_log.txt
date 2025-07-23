@@ -1,3 +1,0 @@
-java-output\Lecture002 Write First C++ Program\firstProgram.java
-java-output\Lecture003 If-Else, While loop & Lots of Patterns\conditionals.java
-java-output\Lecture003 If-Else, While loop & Lots of Patterns\pattern1.java

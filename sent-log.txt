@@ -4,3 +4,6 @@ E:\Desktop\Code\dsa-mailer\java-output\Lecture003 If-Else, While loop & Lots of 
 E:\Desktop\Code\dsa-mailer\java-output\Lecture003 If-Else, While loop & Lots of Patterns\pattern2.java
 E:\Desktop\Code\dsa-mailer\java-output\Lecture003 If-Else, While loop & Lots of Patterns\primeNumber.java
 E:\Desktop\Code\dsa-mailer\java-output\Lecture003 If-Else, While loop & Lots of Patterns\sumOfN.java
+E:\Desktop\Code\dsa-mailer\java-output\Lecture003 If-Else, While loop & Lots of Patterns\whileLoop.java
+E:\Desktop\Code\dsa-mailer\java-output\Lecture004 Solving Pattern Questions (Part-2)\all_patterns.java
+E:\Desktop\Code\dsa-mailer\java-output\Lecture004 Solving Pattern Questions (Part-2)\all_triangle_patterns.java
