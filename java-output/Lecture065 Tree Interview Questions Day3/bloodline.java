@@ -1,129 +1,153 @@
-import java.util.*;
-import java.lang.*;
-import java.io.*;
+1. **What the Code Solves:**
 
-class Node {
-    int data;
-    Node left, right;
+The code finds the **maximum sum of the longest root-to-leaf path in a binary tree**. In other words, among all paths from the root node down to any leaf node, it first considers the longest paths by length (number of nodes). If there are multiple longest paths, it returns the maximum sum of node values along such a path.
 
-    Node(int item) {
-        data = item;
-        left = right = null;
-    }
-}
+---
 
-class Solution {
-    // Recursive helper function to find the sum of the longest root-to-leaf path
-    void solve(Node root, int sum, int[] maxSum, int len, int[] maxLen) {
-        // Base case: if the current node is null
-        if (root == null) {
-            // If the current path length is greater than the maximum length found so far
-            if (len > maxLen[0]) {
-                maxLen[0] = len;
-                maxSum[0] = sum;
-            }
-            //If the current path length is equal to the maximum length found so far
-            else if (len == maxLen[0]) {
-                maxSum[0] = Math.max(sum, maxSum[0]);
-            }
-            return;
+2. **Problem Description (Standalone):**
+
+Given a binary tree, find the root-to-leaf path which has the greatest length (number of nodes). If there are multiple such longest paths, choose the one with the greatest sum of node values. Return this maximum sum.
+
+This problem is common in data structures and is useful to understand depth-first traversals, path tracking, and comparisons on tree paths. It is a frequent question in coding interviews and competitive programming because it combines tree traversal with path property aggregation and tie-breaking.
+
+---
+
+3. **Examples:**
+
+**Example 1:**
+
+Input Tree (level order):  
+`1 2 3 4 5 N 6`
+
+Visual:
+
+```
+       1
+      / \
+     2   3
+    / \    \
+   4   5    6
+```
+
+- Longest root-to-leaf paths: length 3  
+  - 1->2->4 (sum = 7)  
+  - 1->2->5 (sum = 8)  
+  - 1->3->6 (sum = 10)
+
+The longest paths length = 3. Among these, the max sum is 10 for path 1->3->6.
+
+Output:  
+`10`
+
+---
+
+**Example 2:**
+
+Input Tree (level order):  
+`4 2 N 3 1`
+
+Visual:
+
+```
+      4
+     /
+    2
+   / \
+  3   1
+```
+
+- Root-to-leaf paths:  
+  - 4->2->3 (length 3, sum = 9)  
+  - 4->2->1 (length 3, sum = 7)
+
+Longest path length = 3. Max sum among them = 9
+
+Output:  
+`9`
+
+---
+
+4. **Logic Explanation:**
+
+- Use a **recursive depth-first search (DFS)** traversal starting from the root.
+- Track for each recursive call:
+  - `sum`: the sum of node values along the current path from root to current node.
+  - `len`: the length of the current path (number of nodes).
+- When reaching a `NULL` node (meaning leaf’s child):
+  - Compare the current path length (`len`) with the maximum length found so far (`maxLen`).
+  - If current path is longer, update `maxLen` and also update `maxSum` to current `sum`.
+  - If current path length equals `maxLen`, update `maxSum` if current `sum` is greater.
+- Recursively do this for left and right subtrees.
+- The base case ensures that once all paths are considered, you end up with the longest path length and max sum.
+- Return `maxSum` at the end.
+
+**Time Complexity:**  
+O(N), where N is the number of nodes, since every node is visited once.
+
+---
+
+5. **Java Conversion:**
+
+public class LongestRootToLeafSum {
+    static class Node {
+        int data;
+        Node left, right;
+
+        Node(int data) {
+            this.data = data;
+            left = right = null;
         }
-
-        sum = sum + root.data;
-
-        solve(root.left, sum, maxSum, len + 1, maxLen);
-        solve(root.right, sum, maxSum, len + 1, maxLen);
-    }
-
-    int sumOfLongRootToLeafPath(Node root) {
-        int len = 0;
-        int[] maxLen = new int[1];
-        maxLen[0] = 0;
-
-        int sum = 0;
-        int[] maxSum = new int[1];
-        maxSum[0] = Integer.MIN_VALUE;
-
-        solve(root, sum, maxSum, len, maxLen);
-
-        return maxSum[0];
-    }
-}
-
-class GFG {
-    static Node buildTree(String str) {
-        // Corner Case
-        if (str.length() == 0 || str.charAt(0) == 'N') {
-            return null;
-        }
-
-        // Creating vector of strings from input
-        // string after spliting by space
-        String ip[] = str.split(" ");
-
-        // Create the root of the tree
-        Node root = new Node(Integer.parseInt(ip[0]));
-
-        // Push the root to the queue
-        Queue<Node> queue = new LinkedList<>();
-        queue.add(root);
-
-        // Starting from the second element
-        int i = 1;
-        while (queue.size() > 0 && i < ip.length) {
-
-            // Get and remove the front of the queue
-            Node currNode = queue.peek();
-            queue.remove();
-
-            // Get the current node's value from the string
-            String currVal = ip[i];
-
-            // If the left child is not null
-            if (!currVal.equals("N")) {
-
-                // Create the left child for the current Node
-                currNode.left = new Node(Integer.parseInt(currVal));
-
-                // Push it to the queue
-                queue.add(currNode.left);
-            }
-
-            // For the right child
-            i++;
-            if (i >= ip.length) {
-                break;
-            }
-
-            currVal = ip[i];
-
-            // If the right child is not null
-            if (!currVal.equals("N")) {
-
-                // Create the right child for the current node
-                currNode.right = new Node(Integer.parseInt(currVal));
-
-                // Push it to the queue
-                queue.add(currNode.right);
-            }
-            i++;
-        }
-
-        return root;
     }
 
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    public static class Solution {
+        private int maxSum = Integer.MIN_VALUE;
+        private int maxLen = 0;
 
-        int t = Integer.parseInt(br.readLine());
+        private void solve(Node root, int sum, int len) {
+            if (root == null) {
+                // If current path length is greater than maxLen, update maxLen and maxSum
+                if (len > maxLen) {
+                    maxLen = len;
+                    maxSum = sum;
+                }
+                // If equal length, update maxSum if current sum is larger
+                else if (len == maxLen) {
+                    if (sum > maxSum) {
+                        maxSum = sum;
+                    }
+                }
+                return;
+            }
 
-        while (t-- > 0) {
-            String s = br.readLine();
-            Node root = buildTree(s);
-            Solution obj = new Solution();
-            int res = obj.sumOfLongRootToLeafPath(root);
+            sum += root.data;
 
-            System.out.println(res);
+            // Explore children
+            solve(root.left, sum, len + 1);
+            solve(root.right, sum, len + 1);
         }
+
+        public int sumOfLongRootToLeafPath(Node root) {
+            maxSum = Integer.MIN_VALUE;
+            maxLen = 0;
+            solve(root, 0, 0);
+            return maxSum;
+        }
+    }
+
+    // Optional: helper method to build tree (similar to C++ buildTree) could be added here
+
+    public static void main(String[] args) {
+        // Example usage:
+        // Construct the tree manually or via helper methods
+        // For demonstration, using Example 1 tree:
+        Node root = new Node(1);
+        root.left = new Node(2);
+        root.right = new Node(3);
+        root.left.left = new Node(4);
+        root.left.right = new Node(5);
+        root.right.right = new Node(6);
+
+        Solution solution = new Solution();
+        System.out.println(solution.sumOfLongRootToLeafPath(root));  // Output: 10
     }
 }

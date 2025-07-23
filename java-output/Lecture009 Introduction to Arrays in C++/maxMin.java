@@ -1,50 +1,98 @@
-import java.util.Arrays;
-import java.util.Scanner;
+1. **What the Code Solves:**
 
-class FindMinMax {
+This code solves the classic problem of **finding the minimum and maximum elements in an array**.
 
-    // Method to find the minimum element in an array
-    public int getMin(int[] num, int n) {
-        int mini = Integer.MAX_VALUE; // Initialize mini with the maximum possible integer value
+2. **Problem Description:**
 
-        for (int i = 0; i < n; i++) {
-            mini = Math.min(mini, num[i]); // Use Math.min() to find the minimum between mini and num[i]
+Given an array of integers, determine the smallest (minimum) and largest (maximum) values contained in the array. Your task is to efficiently scan through the array to identify these two values without sorting or using additional data structures.
+
+This problem is fundamental in programming and commonly appears in technical interviews and competitive programming, as it tests understanding of array traversal, comparison operations, and optimization of multiple queries.
+
+3. **Examples:**
+
+Example 1:  
+Input:  
+Size = 5  
+Array = [3, 1, 9, 4, 7]  
+Output:  
+Maximum value is 9  
+Minimum value is 1  
+
+Example 2 (edge case: all elements equal):  
+Input:  
+Size = 4  
+Array = [5, 5, 5, 5]  
+Output:  
+Maximum value is 5  
+Minimum value is 5  
+
+4. **Logic Explanation:**
+
+- Initialize two variables: one to track the minimum value (start with a very large number) and one to track the maximum value (start with a very small number).
+- Traverse the array elements once:
+  - For each element:
+    - Update the minimum variable if the current element is smaller.
+    - Update the maximum variable if the current element is larger.
+- After one pass, the two variables will hold the minimum and maximum values of the array.
+  
+**Pattern/Technique:**  
+- Linear Scan / Single-pass traversal.
+
+**Optimization:**  
+- Only one traversal of the array O(n), reducing workspace and time compared to sorting (O(n log n)).
+
+**Time Complexity:** O(n), where n is the size of the input array.
+
+5. **Java Conversion:**
+
+public class MinMaxFinder {
+
+    // Method to find the minimum value in the array
+    public static int getMin(int[] nums) {
+        int min = Integer.MAX_VALUE; // Initialize min to max possible integer
+        for (int num : nums) {
+            if (num < min) {
+                min = num; // Update min if current num is smaller
+            }
         }
-
-        //returning min value
-        return mini;
+        return min;
     }
 
-    // Method to find the maximum element in an array
-    public int getMax(int[] num, int n) {
-        int maxi = Integer.MIN_VALUE; // Initialize maxi with the minimum possible integer value
-
-        for (int i = 0; i < n; i++) {
-            maxi = Math.max(maxi, num[i]); // Use Math.max() to find the maximum between maxi and num[i]
+    // Method to find the maximum value in the array
+    public static int getMax(int[] nums) {
+        int max = Integer.MIN_VALUE; // Initialize max to min possible integer
+        for (int num : nums) {
+            if (num > max) {
+                max = num; // Update max if current num is larger
+            }
         }
-
-        //returning max value
-        return maxi;
+        return max;
     }
 
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int size;
+        java.util.Scanner scanner = new java.util.Scanner(System.in);
+
         System.out.print("Enter the size of the array: ");
-        size = sc.nextInt();
+        int size = scanner.nextInt();
 
-
-        int[] num = new int[100]; // Declare an array of size 100
-
-        //taking input in array
-        System.out.print("Enter the elements of the array: ");
-        for (int i = 0; i < size; i++) {
-            num[i] = sc.nextInt();
+        if (size <= 0) {
+            System.out.println("Array size must be positive.");
+            scanner.close();
+            return;
         }
 
-        FindMinMax obj = new FindMinMax(); //creating object of class
-        System.out.println(" Maximum value is " + obj.getMax(num, size));
-        System.out.println(" Minimum value is " + obj.getMin(num, size));
-        sc.close();
+        int[] nums = new int[size];
+        System.out.println("Enter the elements of the array:");
+        for (int i = 0; i < size; i++) {
+            nums[i] = scanner.nextInt();
+        }
+
+        int minimum = getMin(nums);
+        int maximum = getMax(nums);
+
+        System.out.println("Maximum value is " + maximum);
+        System.out.println("Minimum value is " + minimum);
+
+        scanner.close();
     }
 }

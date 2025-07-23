@@ -1,38 +1,67 @@
-import java.util.Scanner;
+1. **What the Code Solves:**
 
-class PowerCalculator {
+The code implements a basic algorithm to calculate the power of an integer base raised to an integer exponent (i.e., it computes \(num1^{num2}\)) using a simple iterative multiplication loop. This is commonly referred to as the "Exponentiation" or "Power" problem in Data Structures and Algorithms.
 
-    // Method to calculate power of a number
-    public int power(int num1, int num2) {
+2. **Problem Description:**
 
-        // Initialize the result to 1
-        int ans = 1;
+**Problem Statement:**  
+Given two integers, a base `num1` and an exponent `num2`, compute and return the value of \(num1^{num2}\) (the base raised to the power of the exponent). The exponent `num2` is a non-negative integer.
 
-        // Iterate num2 times to calculate power
-        for (int i = 1; i <= num2; i++) {
-            ans = ans * num1;
+**Context:**  
+Calculating the power of a number is a fundamental operation in mathematics and computer science. It appears in many algorithmic problems such as combinatorics, cryptography, and numerical computations. Efficient power calculation is key in competitive programming and system-level calculations. The provided solution uses a direct iterative approach which is simple but can be optimized.
+
+3. **Example Inputs and Outputs:**
+
+- Example 1:  
+  Input: 2 3  
+  Output: answer is 8  
+  Explanation: \(2^3 = 8\).
+
+- Example 2 (Edge case):  
+  Input: 5 0  
+  Output: answer is 1  
+  Explanation: Any number raised to the power 0 is 1.
+
+4. **Logic Explanation:**
+
+- Initialize a variable `ans` to 1 which will store the result.
+- Iterate from 1 to `num2` (the exponent).
+- In each iteration, multiply `ans` by `num1` (the base).
+- After all iterations, `ans` holds the value \(num1^{num2}\).
+- Return `ans` as the result.
+
+**Key points:**  
+- This method uses a simple loop and direct multiplication.
+- It is straightforward but not optimized for large exponents.
+- Optimized methods include **binary exponentiation** which reduces time complexity.
+- Time complexity of this code is **O(num2)**, which is linear in the exponent.
+
+5. **Java Conversion:**
+
+public class PowerCalculator {
+
+    // Method to calculate num1 raised to the power num2 iteratively
+    public static int power(int base, int exponent) {
+        int result = 1;
+        for (int i = 1; i <= exponent; i++) {
+            result *= base; // multiply result by base each iteration
         }
-
-        //Return the calculated power
-        return ans;
+        return result;
     }
 
     public static void main(String[] args) {
-        //Creating an instance of PowerCalculator class
-        PowerCalculator pc = new PowerCalculator();
-        Scanner scanner = new Scanner(System.in);
+        java.util.Scanner scanner = new java.util.Scanner(System.in);
 
-        //Taking inputs from the user
-        System.out.print("Enter the base number: ");
-        int c = scanner.nextInt();
-        System.out.print("Enter the exponent: ");
-        int d = scanner.nextInt();
+        // Read base and exponent from standard input
+        System.out.print("Enter base and exponent: ");
+        int base = scanner.nextInt();
+        int exponent = scanner.nextInt();
 
-        //Calculating power using the power method of PowerCalculator class
-        int answer = pc.power(c, d);
+        int answer = power(base, exponent);
 
-        //Printing the result
-        System.out.println(" answer is " + answer);
+        // Output the calculated power
+        System.out.println("answer is " + answer);
+        
         scanner.close();
     }
 }

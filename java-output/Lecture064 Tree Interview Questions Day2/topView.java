@@ -1,109 +1,168 @@
+1. **What the Code Solves:**
+
+This code computes the **top view of a binary tree**—it returns the nodes visible when the tree is observed from above, from left to right.
+
+2. **Problem Description:**
+
+**Top View of Binary Tree**
+
+Given a binary tree, determine the nodes visible when the tree is viewed from the top. Specifically, for every horizontal distance (HD) from the root, you must find the node that appears first (highest level) at that horizontal distance. The output is a list of those visible nodes, ordered from the leftmost to the rightmost horizontal distance.
+
+This problem is common in data structures and competitive programming as it tests understanding of tree traversal, use of horizontal distances, and hash/map structures for ordered retrieval. It has real-world relevance in visualizing hierarchical data from different perspectives.
+
+3. **Example Inputs/Outputs:**
+
+Example 1:
+```
+Input: 
+        1
+       / \
+      2   3
+       \
+        4
+         \
+          5
+           \
+            6
+
+Output: 2 1 3 6
+
+Explanation:
+Nodes 2, 1, 3, and 6 are visible from top.
+```
+
+Example 2:
+```
+Input:
+        1
+       / \
+      2   3
+     / \  
+    4   5  
+
+Output: 4 2 1 3
+
+Explanation:
+From the top view, nodes 4 (far left), 2, 1 (root), and 3 (far right) are visible.
+```
+
+4. **Solution Logic:**
+
+- Use **Breadth-First Search (BFS)** traversal with a queue to traverse the tree level by level.
+- Track the **horizontal distance (HD)** for each node relative to the root (root HD = 0).
+   - Left child HD = parent HD - 1
+   - Right child HD = parent HD + 1
+- Maintain a **map (ordered by HD)** to store the first node encountered for each HD.
+- For each node during BFS:
+   - If the current HD is not in the map, insert the node’s value.
+   - Skip if HD already recorded (ensures the first/top node at that HD is captured).
+- After traversal, the map keys (HDs) are sorted, so collect and return the node values in key order.
+  
+**Key Points:**
+- BFS ensures nodes are processed top-down by level.
+- Map ensures only the topmost node at a given HD is kept.
+- Using a map ordered by HD guarantees the result is sorted from left to right.
+
+**Time Complexity:**
+- O(N log N) due to map insertions (N = number of nodes).
+- Each node enqueued and processed once.
+- If using a balanced tree map (e.g., TreeMap in Java), insertion/search is O(log N).
+
+5. **Java Code Implementation:**
+
+```java
 import java.util.*;
-import java.lang.*;
-import java.io.*;
 
-// Tree Node
-class Node {
-    int data;
-    Node left;
-    Node right;
+public class TopViewBinaryTree {
 
-    Node(int key) {
-        data = key;
-        left = right = null;
+    // Definition for a binary tree node.
+    static class Node {
+        int data;
+        Node left, right;
+        Node(int val) { this.data = val; }
     }
-}
 
-class Solution {
-    //Function to return a list of nodes visible from the top view
-    //from left to right in Binary Tree.
-    ArrayList<Integer> topView(Node root) {
-        ArrayList<Integer> ans = new ArrayList<>();
-        if (root == null) {
-            return ans;
-        }
+    public static List<Integer> topView(Node root) {
+        List<Integer> result = new ArrayList<>();
+        if (root == null) return result;
 
-        TreeMap<Integer, Integer> topNode = new TreeMap<>();
-        Queue<Pair<Node, Integer>> q = new LinkedList<>();
+        // TreeMap to store the first node at each horizontal distance (hd)
+        Map<Integer, Integer> topNodeMap = new TreeMap<>();
+        // Queue for BFS: stores pairs of (node, horizontal distance)
+        Queue<Pair<Node, Integer>> queue = new LinkedList<>();
 
-        q.add(new Pair<>(root, 0));
+        queue.offer(new Pair<>(root, 0));
 
-        while (!q.isEmpty()) {
-            Pair<Node, Integer> temp = q.poll();
-            Node frontNode = temp.getKey();
+        while (!queue.isEmpty()) {
+            Pair<Node, Integer> temp = queue.poll();
+            Node currentNode = temp.getKey();
             int hd = temp.getValue();
 
-            //if one value is present for a HD, then do nothing
-            if (!topNode.containsKey(hd)) {
-                topNode.put(hd, frontNode.data);
+            // If no node is stored for this horizontal distance, insert this node
+            if (!topNodeMap.containsKey(hd)) {
+                topNodeMap.put(hd, currentNode.data);
             }
 
-            if (frontNode.left != null) {
-                q.add(new Pair<>(frontNode.left, hd - 1));
+            // Enqueue left child with hd-1
+            if (currentNode.left != null) {
+                queue.offer(new Pair<>(currentNode.left, hd - 1));
             }
-            if (frontNode.right != null) {
-                q.add(new Pair<>(frontNode.right, hd + 1));
+            // Enqueue right child with hd+1
+            if (currentNode.right != null) {
+                queue.offer(new Pair<>(currentNode.right, hd + 1));
             }
         }
 
-        for (Integer i : topNode.values()) {
-            ans.add(i);
+        // Collect the top view nodes from leftmost to rightmost
+        for (int val : topNodeMap.values()) {
+            result.add(val);
         }
-        return ans;
+
+        return result;
+    }
+
+    // Helper Pair class (if not using javafx.util.Pair, define simple one)
+    static class Pair<K, V> {
+        private K key;
+        private V value;
+
+        Pair(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public K getKey() { return key; }
+        public V getValue() { return value; }
+    }
+
+    // Optional: method to build example tree and test
+    public static void main(String[] args) {
+        /*
+            Example Tree:
+                    1
+                   / \
+                  2   3
+                   \
+                    4
+                     \
+                      5
+                       \
+                        6
+         */
+        Node root = new Node(1);
+        root.left = new Node(2);
+        root.right = new Node(3);
+        root.left.right = new Node(4);
+        root.left.right.right = new Node(5);
+        root.left.right.right.right = new Node(6);
+
+        List<Integer> topViewNodes = topView(root);
+        for (int val : topViewNodes) {
+            System.out.print(val + " ");
+        }
+        // Expected Output: 2 1 3 6
     }
 }
+```
 
-
-//Function to Build Tree
-class BuildTree {
-    public Node buildTree(String str) {
-        if (str.length() == 0 || str.charAt(0) == 'N') {
-            return null;
-        }
-
-        String ip[] = str.split(" ");
-        Node root = new Node(Integer.parseInt(ip[0]));
-        Queue<Node> queue = new LinkedList<>();
-        queue.add(root);
-        int i = 1;
-        while (queue.size() > 0 && i < ip.length) {
-            Node currNode = queue.peek();
-            queue.remove();
-            String currVal = ip[i];
-            if (!currVal.equals("N")) {
-                currNode.left = new Node(Integer.parseInt(currVal));
-                queue.add(currNode.left);
-            }
-            i++;
-            if (i >= ip.length) {
-                break;
-            }
-            currVal = ip[i];
-            if (!currVal.equals("N")) {
-                currNode.right = new Node(Integer.parseInt(currVal));
-                queue.add(currNode.right);
-            }
-            i++;
-        }
-        return root;
-    }
-}
-
-
-class GFG {
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int t = Integer.parseInt(br.readLine());
-        while (t-- > 0) {
-            String s = br.readLine();
-            BuildTree bt = new BuildTree();
-            Node root = bt.buildTree(s);
-            Solution ob = new Solution();
-            ArrayList<Integer> result = ob.topView(root);
-            for (int value : result) {
-                System.out.print(value + " ");
-            }
-            System.out.println();
-        }
-    }
-}
+This Java code correctly implements the top view computation using BFS and a TreeMap to track horizontal distances in ascending order. It includes comments on key parts, follows Java conventions, and is ready to compile and run.
