@@ -89,7 +89,7 @@ The app will:
 Render URL will look like:
 
 ```
-https://dsa-mailer.onrender.com/send-dsa
+https://<app-name>.onrender.com/send-dsa
 ```
 
 ---
